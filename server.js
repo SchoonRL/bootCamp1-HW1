@@ -6,6 +6,18 @@ var http = require('http'),
 var listingData, server;
 
 var requestHandler = function(request, response) {
+  response.setHeader('Content-Type', 'application/json');
+  switch(request.url) {
+    case '/listings':
+      response.writeHead(200);
+      response.write(JSON.stringify(listingData));
+      response.end();
+      break;
+    default:
+      response.writeHead(404);
+      response.end();
+  }
+
   /*Investigate the request object. 
     You will need to use several of its properties: url and method
   */
@@ -31,7 +43,16 @@ var requestHandler = function(request, response) {
     */
 };
 
+
 fs.readFile('listings.json', 'utf8', function(err, data) {
+  if (err) throw err;
+  listingData = JSON.parse(data);
+
+  server = http.createServer(requestHandler);
+  server.listen(port, function() {
+    console.log('Server listening on: http://127.0.0.1:' + port);
+  })
+  console.log('Server started');
   /*
     This callback function should save the data in the listingData variable, 
     then start the server. 
